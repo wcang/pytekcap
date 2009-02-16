@@ -37,15 +37,19 @@ class iphdr(tekcap):
 	#flags not handled yet
 	fields = ('ihl', 'tos', 'tot_len', 'id', 'df', 'mf', 'frag_off', 'ttl', 'protocol', 
 		'checksum', 'saddr', 'daddr')
-	validator = (ihl_validator, u8_validator, u16_validator, boolean_validator, 
-		boolean_validator,u13_validator, u4_validator, u4_validator, 
+	validator = (ihl_validator, u8_validator, u16_validator, u16_validator, boolean_validator, 
+		boolean_validator,u13_validator, u8_validator, u8_validator, 
 		u16_validator, ipv4_addr_validator, ipv4_addr_validator)
 	version = property(lambda x: 4)
+
 	def __init__(self):
+		self.__dict__['ihl'] = 5
+		self.__dict__['tos'] = 0
 		self.__dict__['df'] = 0
 		self.__dict__['mf'] = 0
-		self.__dict__['ihl'] = 5
+		self.__dict__['frag_off'] = 0
 		self.__dict__['checksum'] = 0
+		self.__dict__['tot_len'] = 0
 
 	def __str__(self):
 		octet = bf()
@@ -61,17 +65,28 @@ class iphdr(tekcap):
 		if self.mf:
 			octet[5] = 1
 
-		octet[0:5] = chr((self.frag_off & 0x1f00) >> 8)
+		octet[0:5] = (self.frag_off & 0x1f00) >> 8
 		output = output + chr(octet) + nc_str(self.frag_off)
 		output = output + chr(self.ttl) + chr(self.protocol)
-		#FIXME checksum
-		if self.checksum != 0:
-			output = output + ns_chr(self.checksum)
-		else:
-			pass
-
-		output = output + ns_str(0) 
+		output = output + ns_str(self.checksum)
 		output = output + self.saddr + self.daddr
 		#FIXME option and padding
+
+		#checksum computation
+		if self.checksum == 0:
+			hdr_len = len(output)
+			csum = 0
+			i = 0
+
+			while hdr_len != 0:
+				csum = csum + (ord((output[i])) << 8) + ord(output[i + 1])
+				i = i + 2
+				hdr_len = hdr_len - 2
+
+			while (csum >> 16) != 0:
+				csum = (csum & 0xffff) + (csum >> 16)
+
+			csum = ~csum
+			output = output[:10] + ns_str(csum) + output[12:]
 
 		return output

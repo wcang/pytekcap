@@ -24,5 +24,13 @@ def ipv4_addr_validator(value):
 	return socket.inet_pton(socket.AF_INET, value)
 
 def boolean_validator(value):
-	if type(value) != types.BooleanType:
-		raise ValueError, "Boolean expected"
+	if type(value) != types.BooleanType and type(value) != types.IntType:
+		raise ValueError, "Boolean or (0|1) expected"
+	
+	if type(value) == types.IntType:
+		if value != 0 and value != 1:
+			raise ValueError, "Boolean or (0|1) expected"
+	if value:
+		return 1
+	else:
+		return 0
