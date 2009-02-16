@@ -42,7 +42,16 @@ class udphdr(tekcap):
 			csum = csum + (ord(temp[0]) << 8) + ord(temp[1])
 			csum = csum + (ord(temp[2]) << 8) + ord(temp[3])
 		elif hdr.version == 4:
-			pass
+			temp = hdr.saddr
+			csum = csum + (ord(temp[0]) << 8) + ord(temp[1])
+			csum = csum + (ord(temp[2]) << 8) + ord(temp[3])
+			temp = hdr.daddr
+			csum = csum + (ord(temp[0]) << 8) + ord(temp[1])
+			csum = csum + (ord(temp[2]) << 8) + ord(temp[3])
+			temp = ns_str(ip.IPPROTO_UDP)
+			csum = csum + (ord(temp[0]) << 8) + ord(temp[1])
+			temp = ns_str(self.len)
+			csum = csum + (ord(temp[0]) << 8) + ord(temp[1])
 		else:
 			raise ValueError, "Invalid IP version"
 
