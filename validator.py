@@ -12,10 +12,12 @@ def int_validator_factory(lower, upper):
 	return func
 
 u8_validator = int_validator_factory(0, 2**8 - 1)
+u7_validator = int_validator_factory(0, 2**7 - 1)
 u20_validator = int_validator_factory(0, 2**20 - 1)
 u16_validator = int_validator_factory(0, 2**16 - 1)
 u4_validator = int_validator_factory(0, 2**4 - 1)
 u13_validator = int_validator_factory(0, 2**13 - 1)
+u32_validator = int_validator_factory(0, 2**32 - 1)
 	
 def ipv6_addr_validator(value):
 	return socket.inet_pton(socket.AF_INET6, value)
@@ -34,3 +36,6 @@ def boolean_validator(value):
 		return 1
 	else:
 		return 0
+
+def empty_validator(value):
+	return value

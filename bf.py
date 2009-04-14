@@ -1,4 +1,4 @@
-#
+# taken from http://code.activestate.com/recipes/113799/
 # bitfield manipulation
 #
 
